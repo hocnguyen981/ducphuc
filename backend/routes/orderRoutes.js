@@ -35,33 +35,33 @@ orderRouter.post(
 
         const order = await newOrder.save();
         const userID = req.user._id;
-        Order.findOne({ id: userID }, function(err, order) {
-            if (err) throw err;
 
-            console.log("shippingPrice: " + order.shippingPrice);
-            console.log("taxPrice: " + order.taxPrice);
-            console.log("totalPrice: " + order.totalPrice);
-            console.log("address: " + order.shippingAddress.fullName);
+
+        for (let i = 0; i < newOrder.orderItems.length; i++) {
+            const nameItem = newOrder.orderItems[i].name;
+            const qty = newOrder.orderItems[i].quantity;
+            const priceItem_one = newOrder.orderItems[i].price;
+            const priceItem = priceItem_one * qty;
+            const priceTax = priceItem * 0.1;
+            const priceTaShip = priceItem > 100 ? 0 : 10;
+            const priceSum = priceItem + priceTax + priceTaShip;
 
 
 
             User.findOne({ id: userID }, function(err, user) {
                 if (err) throw err;
 
-                console.log("User's email: " + user.email);
-                console.log("User's username: " + user.name);
-
-
-
                 const transporter = nodemailer.createTransport({
                     service: "gmail",
                     auth: {
-                        user: "hoavangtrencoxanh981@gmail.com",
-                        pass: "bytakwywycvcglvy"
+                        user: "hongduc981981@gmail.com",
+                        pass: "kddqzypmrkdcyovt"
                     }
                 });
+
+
                 const mailOptions = {
-                    from: "hoavangtrencoxanh981@gmail.com",
+                    from: "hongduc981981@gmail.com",
                     to: user.email,
                     subject: "Xác thực địa chỉ email",
                     text: `Xác thực địa chỉ email`,
@@ -69,25 +69,27 @@ orderRouter.post(
 <div style="max-width: 700px; margin:auto; border: 10px solid #ddd; padding: 50px 20px; font-size: 110%;">
       <h2 style="text-align: center; text-transform: uppercase;color: teal;">Cám ơn bạn đã đặt hàng tại Đức Phúc!.</h2>
 
-      <p>Xin chào ${order.shippingAddress.fullName},</p>
+      <p>Xin chào ${req.body.shippingAddress.fullName},</p>
       <p>Đức Phúc đã nhận được yêu cầu đặt hàng của bạn và đang xử lý nhé. \n
       </p>
       <h2>Đơn hàng được giao đến</h2>
-      <p>Tên:             ${order.shippingAddress.fullName}</p>
-      <p>Địa chỉ nhà:     ${order.shippingAddress.address}, ${order.shippingAddress.city} ,${order.shippingAddress.country}</p>
-      <p>Số điện thoại:   ${order.postalCode} </p>
+      <p>Tên:             ${req.body.shippingAddress.fullName}</p>
+      <p>Địa chỉ nhà:     ${req.body.shippingAddress.address}, ${req.body.shippingAddress.city} ,${req.body.shippingAddress.country}</p>
+      <p>Số điện thoại:   ${req.body.shippingAddress.postalCode} </p>
       <p>Email:           ${user.email}</p>
       <h2>Kiện Hàng</h2>
-      <p>Tên sản phẩm:    ${order.orderItems.name}</p>
-      <p>Tiền sản phẩm:   ${order.itemsPrice}</p>
-      <p>Tiền Ship:       ${order.shippingPrice}</p>
-      <p>Tiền Thuế:       ${order.taxPrice}</p>
-      <p>Tổng tiền:       ${order.totalPrice}</p>
+      <p>Tên sản phẩm:    ${nameItem} &emsp;&emsp; Số lượng :${qty}</p>
+      <p>Thành tiền :&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;$${priceItem}</p>
+      <p>Phí Ship  :&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;$${priceTaShip}</p>
+      <p>Phí VAT   :&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;$${priceTax}</p>
+      <p>Tổng  tiền :&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;$${priceSum}</p>
+     
       `
                 };
+
                 const result_ = transporter.sendMail(mailOptions);
             });
-        });
+        }
 
         res.status(201).send({ message: 'New Order Created', order });
 

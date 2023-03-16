@@ -204,12 +204,12 @@ userRouter.post(
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: "hoavangtrencoxanh981@gmail.com",
-                pass: "bytakwywycvcglvy"
+                user: "hongduc981981@gmail.com",
+                pass: "kddqzypmrkdcyovt"
             }
         });
         const mailOptions = {
-            from: "hoavangtrencoxanh981@gmail.com",
+            from: "hongduc981981@gmail.com",
             to: req.body.email,
             subject: "Xác thực địa chỉ email",
             text: `Xác thực địa chỉ email`,
